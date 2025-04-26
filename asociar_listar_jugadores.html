@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asociar Jugador a Equipo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex justify-center items-center min-h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h1 class="text-2xl font-semibold mb-6 text-center text-blue-600">Asociar Jugador a Equipo</h1>
+        <form id="asociarForm" class="space-y-4">
+            <div>
+                <label for="jugador" class="block text-gray-700 text-sm font-bold mb-2">Jugador:</label>
+                <select id="jugador" name="jugador" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <option value="" disabled selected>Seleccione un jugador</option>
+                </select>
+            </div>
+            <div>
+                <label for="equipo" class="block text-gray-700 text-sm font-bold mb-2">Equipo:</label>
+                <select id="equipo" name="equipo" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <option value="" disabled selected>Seleccione un equipo</option>
+                </select>
+            </div>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">Asociar Jugador a Equipo</button>
+        </form>
+        <div id="mensaje" class="mt-4 text-center text-gray-600"></div>
+    </div>
+    <script>
+        window.onload = function() {
+            const jugadorSelect = document.getElementById("jugador");
+            const equipoSelect = document.getElementById("equipo");
+            const asociarForm = document.getElementById("asociarForm");
+            const mensaje = document.getElementById("mensaje");
+
+            // Función para llenar el desplegable de jugadores
+            function cargarJugadores() {
+                fetch("/jugadores")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Error al cargar jugadores: " + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    jugadorSelect.innerHTML = '<option value="" disabled selected>Seleccione un jugador</option>';
+                    data.forEach(jugador => {
+                        let option = document.createElement("option");
+                        option.value = jugador.player_id;
+                        option.textContent = jugador.name;
+                        jugadorSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    mensaje.textContent = error.message;
+                });
+            }
+
+            // Función para llenar el desplegable de equipos
+            function cargarEquipos() {
+                fetch("/equipos")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Error al cargar equipos: " + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    equipoSelect.innerHTML = '<option value="" disabled selected>Seleccione un equipo</option>'; // Limpiar opciones anteriores
+                    data.forEach(equipo => {
+                        let option = document.createElement("option");
+                        option.value = equipo.team_id;
+                        option.textContent = equipo.name;
+                        equipoSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    mensaje.textContent = error.message;
+                });
+            }
+
+            // Cargar jugadores y equipos al cargar la página
+            cargarJugadores();
+            cargarEquipos();
+
+            asociarForm.addEventListener("submit", function(event) {
+                event.preventDefault(); // Evita el envío por defecto del formulario
+                const jugadorId = document.getElementById("jugador").value;
+                const equipoId = document.getElementById("equipo").value;
+
+                if (!jugadorId || !equipoId) {
+                    mensaje.textContent = "Por favor, seleccione un jugador y un equipo.";
+                    return;
+                }
+
+                // Enviar datos al servidor para la asociación
+                fetch("/asignaciones", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ jugador_id: jugadorId, equipo_id: equipoId })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Error al asociar jugador: " + response.status);
+                      }
+                    return response.json();
+                })
+                .then(data => {
+                    mensaje.textContent = data.mensaje;
+                    asociarForm.reset(); // Limpiar el formulario
+                })
+                .catch(error => {
+                    mensaje.textContent = error.message;
+                });
+            });
+        };
+    </script>
+</body>
+</html>
+
+
