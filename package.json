@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "express": "^5.1.0",
+    "mysql2": "^3.14.0"
+  },
+  "name": "jugadores-futbol-peruano",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JuniorTovar/jugadores-futbol-peruano.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JuniorTovar/jugadores-futbol-peruano/issues"
+  },
+  "homepage": "https://github.com/JuniorTovar/jugadores-futbol-peruano#readme",
+  "description": ""
+}
